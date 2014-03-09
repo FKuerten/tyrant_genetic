@@ -1,0 +1,8 @@
+/target/
+.makepp/
+/achievements.xml
+/cards.xml
+/missions.xml
+/raids.xml
+/quests.xml
+/tyrant_optimize
