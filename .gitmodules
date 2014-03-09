@@ -1,0 +1,15 @@
+[submodule "modules/binary/scripts"]
+	path = modules/binary/scripts
+	url = git@github.com:Pr4370r14n/praetorian-scripts.git
+[submodule "modules/mutator"]
+	path = modules/mutator
+	url = git@github.com:Pr4370r14n/tyrant-mutator.git
+[submodule "modules/core"]
+	path = modules/core
+	url = git@github.com:Pr4370r14n/tyrant-core.git
+[submodule "scripts"]
+	path = scripts
+	url = git@github.com:Pr4370r14n/praetorian-scripts.git
+[submodule "modules/basics"]
+	path = modules/basics
+	url = git@github.com:Pr4370r14n/praetorian-basics.git
