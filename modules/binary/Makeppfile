@@ -1,0 +1,10 @@
+MODULEDIR=.
+include config.mk
+include scripts/makefile.mk
+
+target/${MODULE_NAME}: $(infer_objects target/objects/cli/main.o++, ${OBJECTS}) ${OWN_LIB_FILES} ${DEPENDENCY_FILES}
+	@if [ -e ${output} ]; then rm ${output}; echo "rm ${output}"; fi
+	${CXX} ${LDFLAGS} \
+	       $(infer_objects target/objects/cli/main.o++, ${OBJECTS}) \
+	       ${ALLLIBS} \
+	       -o ${output}

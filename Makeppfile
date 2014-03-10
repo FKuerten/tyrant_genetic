@@ -1,6 +1,6 @@
 load_makefile modules/binary
 
-target/tyrantMutator: modules/binary/target/tyrantMutator
+target/tyrantGenetic: modules/binary/target/tyrantGenetic
     @mkdir -p target
     cp ${input} ${output}
 
@@ -8,7 +8,10 @@ target/dependencies: modules/binary/target/dependencies
     @mkdir -p target
     cp ${input} ${output}
 
-$(phony compile): target/tyrantMutator
+$(phony compile): target/tyrantGenetic
 
 $(phony list_libraries): target/dependencies
     cat $(input)
+
+tyrant_optimize: ../tyrant_optimize/tyrant_optimize
+    cp ${input} ${output}
