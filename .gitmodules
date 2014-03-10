@@ -13,3 +13,6 @@
 [submodule "modules/basics"]
 	path = modules/basics
 	url = git@github.com:Pr4370r14n/praetorian-basics.git
+[submodule "modules/cache"]
+	path = modules/cache
+	url = git@github.com:Pr4370r14n/tyrant-cache.git
