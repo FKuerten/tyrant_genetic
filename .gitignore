@@ -6,3 +6,6 @@
 /raids.xml
 /quests.xml
 /tyrant_optimize
+/callgrind.out.*
+/cache.sqlite
+/ownedcards.txt
