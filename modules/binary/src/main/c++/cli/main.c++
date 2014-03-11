@@ -38,14 +38,14 @@ int main(int const argc, char * const * const argv)
             //std::clog << "Signal handlers installed." << std::endl;
         #endif
 
-        srand(time(NULL));
+        srand(static_cast<unsigned int>(time(nullptr)));
         command->execute();
 
         #ifdef _POSIX_SOURCE
-            sigaction(SIGINT, &oldIntAction, 0);
-            sigaction(SIGTERM, &oldTermAction, 0);
+            sigaction(SIGINT, &oldIntAction, nullptr);
+            sigaction(SIGTERM, &oldTermAction, nullptr);
             //std::clog << "Signal handlers removed." << std::endl;
-            ::theCommand = NULL;
+            ::theCommand = nullptr;
         #endif
 
     } catch(Exception const & e) {
