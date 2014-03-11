@@ -1,6 +1,5 @@
 # Configuration section
-MODULE_NAME:=tyrantGenetic
+MODULE_NAME=tyrantGenetic
 DEPENDENCIES:=core cache mutator
 LIBS:=-lboost_program_options -lboost_regex
-CXXFLAGS+= --std=c++11
-
+CXX_STANDARD=c++11

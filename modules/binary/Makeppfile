@@ -1,10 +1,12 @@
 MODULEDIR=.
 include config.mk
-include scripts/makefile.mk
+include scripts/module.mk
 
-target/${MODULE_NAME}: $(infer_objects target/objects/cli/main.o++, ${OBJECTS}) ${OWN_LIB_FILES} ${DEPENDENCY_FILES}
+#foo:=$(print ${OBJECTS_STATIC_NODEBUG})
+
+target/${MODULE_NAME}: $(infer_objects target/objects-static-nodebug/cli/main.o++, ${OBJECTS_STATIC_NODEBUG}) ${OWN_LIB_FILES} ${DEPENDENCY_FILES}
 	@if [ -e ${output} ]; then rm ${output}; echo "rm ${output}"; fi
 	${CXX} ${LDFLAGS} \
-	       $(infer_objects target/objects/cli/main.o++, ${OBJECTS}) \
+	       $(infer_objects target/objects-static-nodebug/cli/main.o++, ${OBJECTS_STATIC_NODEBUG}) \
 	       ${ALLLIBS} \
 	       -o ${output}
