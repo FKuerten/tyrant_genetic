@@ -48,12 +48,26 @@ namespace TyrantCache {
             }
         }
 
-        // Still old NETRAT code...
+        unsigned short base64CharToNumber(char const base64Char) {
+            if (base64Char >= 'A' && base64Char <= 'Z') {
+                return static_cast<unsigned short>(base64Char - 'A');
+            } else if (base64Char >= 'z' && base64Char <= 'z') {
+                return static_cast<unsigned short>(base64Char - 'a' + 26);
+            } else if (base64Char >= '0' && base64Char <= '9') {
+                return static_cast<unsigned short>(base64Char - '0' + 52);
+            } else if (base64Char == '+') {
+                return 62u;
+            } else {
+                assertEQ(base64Char, '/');
+                return 63u;
+            }
+        }
+
+        // Still old NETRAT comment...
         unsigned int base64ToId(unsigned short const base64)
         {
-            #define DecodeBase64(x) (((x >= 'A') && (x <= 'Z')) ? (x - 'A') : (((x >= 'a') && (x <= 'z')) ? (x - 'a' + 26) : (((x >= '0') && (x <= '9')) ? (x - '0' + 52) : ((x == '+') ? (62) : (63)))))
             // same stuff as with ID2BASE64, hi and lo swapped
-            return DecodeBase64((base64 & 0xFF)) + DecodeBase64((base64 >> 8)) * 64;
+            return base64CharToNumber((base64 & 0xFF)) + base64CharToNumber((base64 >> 8)) * 64u;
         }
 
         unsigned long const CARD_MAX_ID = 5000u;

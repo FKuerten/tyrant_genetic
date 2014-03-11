@@ -35,7 +35,7 @@ namespace Tyrant {
                 = this->mutator->mutate(mutationTask);
             CSDeckVector mutations(mutationResult.begin, mutationResult.end);
             unsigned int size = mutations.size();
-            unsigned int index = rand() % size;
+            unsigned int index = static_cast<unsigned int>(rand()) % size;
             Core::StaticDeckTemplate::ConstPtr element
                 = mutations[index];
             return element;
@@ -47,7 +47,7 @@ namespace Tyrant {
             )
         {
             unsigned int size = population.size();
-            unsigned int index = rand() % size;
+            unsigned int index = static_cast<unsigned int>(rand()) % size;
             Core::StaticDeckTemplate::ConstPtr element
                 = population[index];
             return this->mutate(element);
@@ -86,7 +86,7 @@ namespace Tyrant {
             (std::vector<T> & population)
         {
             unsigned int size = population.size();
-            unsigned int index = rand() % size;
+            unsigned int index = static_cast<unsigned int>(rand()) % size;
             T element = population[index];
             population.erase(population.begin() + index);
             return element;
@@ -188,7 +188,7 @@ namespace Tyrant {
         }
 
         double randomDouble() {
-            return static_cast<double>(random())
+            return static_cast<double>(rand())
                 /
                 static_cast<double>(RAND_MAX);
         }
@@ -251,7 +251,7 @@ namespace Tyrant {
             )
         {
             unsigned int size = parents.size();
-            return parents[random() % size];
+            return parents[static_cast<unsigned int>(rand()) % size];
         }
 
         unsigned int
@@ -261,7 +261,7 @@ namespace Tyrant {
             )
         {
             unsigned int size = parents.size();
-            return parents[random() % size];
+            return parents[static_cast<unsigned int>(rand()) % size];
         }
 
         unsigned int
@@ -271,7 +271,7 @@ namespace Tyrant {
             )
         {
             unsigned int size = parents.size();
-            return parents[random() % size];
+            return parents[static_cast<unsigned int>(rand()) % size];
         }
 
         std::vector<unsigned int>
