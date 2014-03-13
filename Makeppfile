@@ -8,7 +8,7 @@ target/dependencies: modules/binary/target/dependencies
     @mkdir -p target
     cp ${input} ${output}
 
-$(phony compile): target/tyrantGenetic
+$(phony compile): modules/binary/binaries
 
 $(phony list_libraries): target/dependencies
     cat $(input)
