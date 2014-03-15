@@ -1,17 +1,10 @@
 load_makefile modules/binary
 
-target/tyrantGenetic: modules/binary/target/tyrantGenetic
+target/tyrantGenetic: modules/binary/target/tyrantGenetic-static-debug
     @mkdir -p target
     cp ${input} ${output}
 
-target/dependencies: modules/binary/target/dependencies
-    @mkdir -p target
-    cp ${input} ${output}
-
-$(phony compile): modules/binary/binaries
-
-$(phony list_libraries): target/dependencies
-    cat $(input)
+$(phony compile binaries): modules/binary/binaries
 
 tyrant_optimize: ../tyrant_optimize/tyrant_optimize
     cp ${input} ${output}

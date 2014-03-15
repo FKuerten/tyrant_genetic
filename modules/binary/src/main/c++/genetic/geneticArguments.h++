@@ -15,7 +15,8 @@
                 unsigned int numberOfChildren;
                 double childMutationProbability;
                 unsigned int numberOfGenerations;
-                bool byArd;
+                bool byPoints;
+                bool mutateAttacker;
                 Core::SimulationTask simulationTask;
 
                 GeneticArguments();

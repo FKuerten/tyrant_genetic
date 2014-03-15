@@ -10,8 +10,9 @@ namespace Tyrant {
         , parentDeathProbability(0.25)
         , numberOfChildren(4)
         , childMutationProbability(0.01)
-        , numberOfGenerations(10)
-        , byArd(false)
+        , numberOfGenerations(5)
+        , byPoints(false)
+        , mutateAttacker(true)
         {
         }
 

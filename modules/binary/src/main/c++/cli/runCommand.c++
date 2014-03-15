@@ -21,8 +21,9 @@ namespace TyrantGenetic {
                 = this->configuration.constructCore();
             Tyrant::Mutator::Mutator::Ptr mutator
                 = this->configuration.constructMutator();
+            int verbosity = configuration.verbosity;
             this->geneticAlgorithm = Tyrant::Genetic::GeneticAlgorithm::Ptr(
-                new Tyrant::Genetic::GeneticAlgorithm(rootLogger, simulator, mutator)
+                new Tyrant::Genetic::GeneticAlgorithm(rootLogger, simulator, mutator, verbosity)
             );
         }
 

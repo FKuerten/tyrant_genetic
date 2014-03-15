@@ -7,38 +7,246 @@
 #include <errorHandling/assert.h++>
 #include <algorithm>
 #include <logging/indentedLogger.h++>
+#include <logging/nullLogger.h++>
+#include <limits>
 
 using namespace Praetorian::Basics::Logging;
 namespace Tyrant {
     namespace Genetic {
 
+         class DeckComparator {
+            Core::SimulatorCore::Ptr simulator;
+            GeneticArguments const & arguments;
+            bool ascending;
+            Logger::Ptr logger;
+
+            public:
+                DeckComparator
+                    (Core::SimulatorCore::Ptr simulator
+                    ,GeneticArguments const & arguments
+                    ,bool ascending
+                    ,Logger::Ptr logger
+                    )
+                : simulator(simulator)
+                , arguments(arguments)
+                , ascending(ascending)
+                , logger(logger)
+                {}
+
+                double getScore(Core::StaticDeckTemplate::ConstPtr deck)
+                {
+                    bool const DEBUG_GET_SCORE = false;
+                    assertX(deck.get() != nullptr);
+                    Core::SimulationTask task = this->arguments.simulationTask;
+                    if (this->arguments.mutateAttacker) {
+                        task.attacker = deck;
+                    } else {
+                        task.defender = deck;
+                    }
+                    if (DEBUG_GET_SCORE) {
+                        this->logger->write("::getScore(")->write(*deck)->writeln(")");
+                        this->logger->write("    task.attacker=")->writeln(*task.attacker);
+                        this->logger->write("    task.defender=")->writeln(*task.defender);
+                        this->logger->write("    task.surge=")->writeln(task.surge);
+                        this->logger->write("    task.useRaidRules=");
+                        if(task.useRaidRules == Core::tristate::TRUE) {
+                            this->logger->writeln("true");
+                        } else if(task.useRaidRules == Core::tristate::FALSE) {
+                            this->logger->writeln("false");
+                        } else {
+                            this->logger->writeln("undefined");
+                        }
+                    }
+
+                    Core::SimulationResult result = this->simulator->simulate(task);
+                    if (DEBUG_GET_SCORE) {
+                        this->logger->write("    result.gamesWon=")->writeln(result.gamesWon);
+                        this->logger->write("    result.numberOfGames=")->writeln(result.numberOfGames);
+                        this->logger->write("    arguments.byPoints=")->writeln(arguments.byPoints);
+                    }
+                    double score;
+                    if (this->arguments.byPoints) {
+                        score = result.getManualANPAttacker();
+                    } else {
+                        score = result.getWinRate();
+                    }
+                    if (DEBUG_GET_SCORE) {
+                        this->logger->write("::getScore(")->write(*deck)->write(")")
+                                    ->write(" = ")->write(score)
+                                    ->writeln();
+                    }
+                    return score;
+                }
+
+                bool operator() (Core::StaticDeckTemplate::ConstPtr a, Core::StaticDeckTemplate::ConstPtr b)
+                {
+                    if (this->ascending) {
+                        return this->getScore(a) < this->getScore(b);
+                    } else {
+                        return this->getScore(a) > this->getScore(b);
+                    }
+                }
+        };
+
+        //##############################################################
+        //##                   Constructors                           ##
+        //##############################################################
         GeneticAlgorithm::GeneticAlgorithm
             (Praetorian::Basics::Logging::Logger::Ptr logger
             ,Core::SimulatorCore::Ptr simulator
             ,Mutator::Mutator::Ptr mutator
+            ,int verbosity
             )
         : logger(logger)
         , simulator(simulator)
         , mutator(mutator)
         , aborted(false)
+        , verbosity(verbosity)
         {
         }
 
+        //##############################################################
+        //##                      Helpers                             ##
+        //##############################################################
+
+        Logger::Ptr
+        GeneticAlgorithm::getSubLogger(Logger::Ptr logger, int subLevel)
+        {
+            if(subLevel <= this->verbosity) {
+                return Logger::Ptr(
+                    new IndentedLogger(logger, "    ")
+                );
+            } else {
+                return Logger::Ptr(
+                    new NullLogger()
+                );
+            }
+        }
+
+        void
+        GeneticAlgorithm::printStatistics
+            (Logger::Ptr logger
+            ,GeneticArguments const & arguments
+            ,Population const & population
+            )
+        {
+            if (!logger->isEnabled()) {
+                return;
+            }
+
+            Core::StaticDeckTemplate::ConstPtr bestDeck, worstDeck;
+            double bestScore = std::numeric_limits<double>::min();
+            double worstScore = std::numeric_limits<double>::max();
+            std::vector<double> scores;
+
+            DeckComparator compare(this->simulator, arguments, false, logger);
+            for(Core::StaticDeckTemplate::ConstPtr deck : population) {
+                double score = compare.getScore(deck);
+                if (score > bestScore) {
+                    bestDeck = deck;
+                    bestScore = score;
+                }
+                if (score < worstScore) {
+                    worstDeck = deck;
+                    worstScore = score;
+                }
+                scores.push_back(score);
+            }
+            std::sort(scores.begin(), scores.end());
+
+            double sum = 0;
+            for(double score : scores) {
+                sum+=score;
+            }
+
+            size_t const size = scores.size();
+            double median;
+            if (size % 2 == 0) {
+                median = (scores[size/2-1] + scores[size/2]) / 2;
+            } else {
+                median = scores[size / 2];
+            }
+            double const average = sum / size;
+
+            logger->write("Population size:    ")->writeln(size)
+                  ->write("           best:    ")->write(bestScore)
+                  ->write(" with ")->writeln(*bestDeck)
+                  ->write("           worst:   ")->write(worstScore)
+                  ->write(" with ")->writeln(*worstDeck)
+                  ->write("           average: ")->write(average)
+                  ->write("           median:  ")->write(median)
+                  ->writeln();
+        }
+
+        //##############################################################
+        //##                      Level 0                             ##
+        //##############################################################
+        GeneticResult
+        GeneticAlgorithm::evolve
+            (GeneticArguments const & arguments
+            )
+        {
+            // Store our population, initially the initial population,
+            // will be updated.
+            Population population(arguments.initialPopulation.cbegin()
+                                  ,arguments.initialPopulation.cend()
+                                  );
+            Logger::Ptr subLogger = this->getSubLogger(this->logger, 2);
+            this->preMutate(arguments, population);
+            unsigned int const populationTreshold =
+                (arguments.minPopulationSize + arguments.maxPopulationSize) /2;
+            for(unsigned int generationIndex = 0
+               ;generationIndex < arguments.numberOfGenerations
+               ;generationIndex++
+               )
+            {
+                this->logger->write("Beginning generation ")
+                            ->write(generationIndex)
+                            ->write(" with size ")
+                            ->write(population.size())
+                            ->writeln();
+
+                // Reduce population
+                while(population.size() > populationTreshold) {
+                    population = this->selectStep(arguments, population);
+                    this->logger->write("Reducing population size to ")
+                                ->write(population.size())
+                                ->writeln(".");
+                }
+
+                // Increase population again
+                population = this->reproduceStep(subLogger, arguments, population);
+
+                // Statistics
+                this->printStatistics(this->logger, arguments, population);
+
+                if(this->aborted) {
+                    throw AbortionException("Aborted!");
+                }
+
+            }
+            return GeneticResult(population.begin(), population.end());
+        }
+
+        //##############################################################
+        //##                     Level >=0                            ##
+        //##############################################################
         Core::StaticDeckTemplate::ConstPtr
         GeneticAlgorithm::mutate
             (Core::StaticDeckTemplate::ConstPtr deck
             )
         {
-            Mutator::MutationTask mutationTask;
-            mutationTask.baseDeck = deck;
-            Mutator::MutationResult mutationResult
-                = this->mutator->mutate(mutationTask);
-            CSDeckVector mutations(mutationResult.begin, mutationResult.end);
-            unsigned int size = mutations.size();
-            unsigned int index = static_cast<unsigned int>(rand()) % size;
-            Core::StaticDeckTemplate::ConstPtr element
-                = mutations[index];
-            return element;
+            //Mutator::MutationTask mutationTask;
+            //mutationTask.baseDeck = deck;
+            //Mutator::MutationResult mutationResult
+                //= this->mutator->mutate(mutationTask);
+            //CSDeckVector mutations(mutationResult.begin, mutationResult.end);
+            //unsigned int size = mutations.size();
+            //unsigned int index = static_cast<unsigned int>(rand()) % size;
+            //Core::StaticDeckTemplate::ConstPtr element
+                //= mutations[index];
+            //return element;
+            return this->mutator->quickMutate(deck);
         }
 
         Core::StaticDeckTemplate::ConstPtr
@@ -109,51 +317,6 @@ namespace Tyrant {
             return pickedDecks;
         }
 
-        class DeckComparator {
-            Core::SimulatorCore::Ptr simulator;
-            GeneticArguments const & arguments;
-            bool ascending;
-            Logger::Ptr logger;
-            bool changeAttacker = true;
-
-            public:
-                DeckComparator
-                    (Core::SimulatorCore::Ptr simulator
-                    ,GeneticArguments const & arguments
-                    ,bool ascending
-                    ,Logger::Ptr logger
-                    )
-                : simulator(simulator)
-                , arguments(arguments)
-                , ascending(ascending)
-                , logger(logger)
-                {}
-
-                bool operator() (Core::StaticDeckTemplate::ConstPtr a, Core::StaticDeckTemplate::ConstPtr b)
-                {
-                    //this->logger->write("Comparing ")->write(*a);
-                    //this->logger->write(" with ")->write(*b);
-                    Core::SimulationTask taskA = this->arguments.simulationTask;
-                    Core::SimulationTask taskB = this->arguments.simulationTask;
-                    if (this->changeAttacker) {
-                        taskA.attacker = a;
-                        taskB.attacker = b;
-                    } else {
-                        taskA.defender = a;
-                        taskB.defender = b;
-                    }
-                    Core::SimulationResult resultA = this->simulator->simulate(taskA);
-                    Core::SimulationResult resultB = this->simulator->simulate(taskB);
-                    bool smaller;
-                    if (this->arguments.byArd) {
-                        smaller = resultA.getManualANPAttacker() < resultB.getManualANPAttacker();
-                    } else {
-                        smaller = resultA.getWinRate() < resultB.getWinRate();
-                    }
-                    //this->logger->writeln();
-                    return this->ascending ? smaller : !smaller;
-                }
-        };
 
         void
         GeneticAlgorithm::sortAndCrop
@@ -162,6 +325,58 @@ namespace Tyrant {
             ,unsigned int targetSize)
         {
             DeckComparator compare(this->simulator, arguments, false, this->logger);
+            if (false) {
+                // Unfortunately compare might not be a strict weak ordering
+                // this is very unlikely, but might happen.
+                // If we use a cache it is probably impossible.
+                // We do an expensive check now:
+                std::clog << "Expensive pre-check for sort." << std::endl;
+                for (auto a : decks) {
+                    //
+                    if(compare(a,a)) {
+                        std::stringstream ssMessage;
+                        ssMessage << "Something broke: va<va (this violates irreflexivity)" << std::endl;
+                        ssMessage << "Where va=" << compare.getScore(a),
+                        ssMessage << " a=" << std::string(*a) << std::endl;
+                        throw LogicError(ssMessage.str());
+                    }
+                    for (auto b : decks) {
+                        bool const lt = compare(a,b);
+                        bool const gt = compare(b,a);
+                        if (lt && gt) {
+                            std::stringstream ssMessage;
+                            ssMessage << "Something broke: va<vb && vb<va (this violates asymmetry)" << std::endl;
+                            ssMessage << "Where va=" << compare.getScore(a),
+                            ssMessage << " a=" << std::string(*a) << std::endl;
+                            ssMessage << "      vb=" << compare.getScore(b) << std::endl;
+                            ssMessage << " b=" << std::string(*b) << std::endl;
+                            throw LogicError(ssMessage.str());
+                        }
+                        if(lt) {
+                            for (auto c : decks) {
+                                bool const lt2 = compare(b,c);
+                                bool const lt3 = compare(a,c);
+                                if(lt2 && !lt3) {
+                                    std::stringstream ssMessage;
+                                    ssMessage << "Something broke: va<vb && vb<vc but va!<vc (this violates transitivity)" << std::endl;
+                                    ssMessage << "Where va=" << compare.getScore(a),
+                                    ssMessage << " a=" << std::string(*a) << std::endl;
+                                    ssMessage << "      vb=" << compare.getScore(b) << std::endl;
+                                    ssMessage << " b=" << std::string(*b) << std::endl;
+                                    ssMessage << "      vc=" << compare.getScore(c) << std::endl;
+                                    ssMessage << " c=" << std::string(*c) << std::endl;
+                                    throw LogicError(ssMessage.str());
+                                }
+                            }
+                        }
+                    }
+                }
+                // Check that each pointer points to something valid.
+                for (auto a: decks) {
+                    assertX(a.get() != nullptr);
+                    assertGT(std::string(*a).size(),0u);
+                }
+            }
             std::sort(decks.begin(), decks.end(), compare);
             decks.resize(targetSize);
         }
@@ -184,6 +399,9 @@ namespace Tyrant {
                 result.insert(result.end(), pickedDecks.cbegin(), pickedDecks.cend());
             }
             result.insert(result.end(), population.cbegin(), population.cend());
+            if(this->aborted) {
+                throw AbortionException("Aborted!");
+            }
             return result;
         }
 
@@ -398,48 +616,6 @@ namespace Tyrant {
             }
             result.insert(result.end(), population.cbegin(), population.cend());
             return result;
-        }
-
-        GeneticResult
-        GeneticAlgorithm::evolve
-            (GeneticArguments const & arguments
-            )
-        {
-            Population population(arguments.initialPopulation.cbegin()
-                                  ,arguments.initialPopulation.cend()
-                                  );
-            Logger::Ptr subLogger = Logger::Ptr(
-                new IndentedLogger(this->logger, "    ")
-            );
-            this->preMutate(arguments, population);
-            unsigned int const populationTreshold =
-                (arguments.minPopulationSize + arguments.maxPopulationSize) /2;
-            for(unsigned int generationIndex = 0
-               ;generationIndex < arguments.numberOfGenerations
-               ;generationIndex++
-               )
-            {
-                this->logger->write("Beginning generation ")
-                            ->write(generationIndex)
-                            ->write(" with size ")
-                            ->write(population.size())
-                            ->writeln();
-
-                // Reduce population
-                while(population.size() > populationTreshold) {
-                    population = this->selectStep(arguments, population);
-                    if(this->aborted) {
-                        throw AbortionException("Aborted!");
-                    }
-                }
-
-                // Increase population again
-                population = this->reproduceStep(subLogger, arguments, population);
-                if(this->aborted) {
-                    throw AbortionException("Aborted!");
-                }
-            }
-            return GeneticResult(population.begin(), population.end());
         }
 
         void

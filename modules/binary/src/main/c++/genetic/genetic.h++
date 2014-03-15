@@ -18,16 +18,23 @@
             typedef CSDeckVector Population;
 
             class GeneticAlgorithm {
-                public:
+                public: // types
                     typedef std::shared_ptr<GeneticAlgorithm> Ptr;
 
-                private:
+                private: // data
                     Praetorian::Basics::Logging::Logger::Ptr logger;
                     Core::SimulatorCore::Ptr simulator;
                     Mutator::Mutator::Ptr mutator;
                     bool aborted;
+                    int verbosity;
 
                 private: // methods
+                    Praetorian::Basics::Logging::Logger::Ptr
+                        getSubLogger
+                            (Praetorian::Basics::Logging::Logger::Ptr parent
+                            ,int subLevel
+                            );
+
                     Core::StaticDeckTemplate::ConstPtr mutate
                         (Core::StaticDeckTemplate::ConstPtr deck);
 
@@ -52,11 +59,18 @@
                         ,Population & decks
                         ,unsigned int targetSize);
 
+                    void printStatistics
+                        (Praetorian::Basics::Logging::Logger::Ptr logger
+                        ,GeneticArguments const & arguments
+                        ,Population const & population
+                        );
+
                 public: // methods
                     GeneticAlgorithm
                         (Praetorian::Basics::Logging::Logger::Ptr logger
                         ,Core::SimulatorCore::Ptr simulator
                         ,Mutator::Mutator::Ptr mutator
+                        ,int verbosity=0
                         );
 
                     GeneticResult evolve(GeneticArguments const & arguments);
