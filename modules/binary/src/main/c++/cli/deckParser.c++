@@ -51,7 +51,7 @@ namespace TyrantCache {
         unsigned short base64CharToNumber(char const base64Char) {
             if (base64Char >= 'A' && base64Char <= 'Z') {
                 return static_cast<unsigned short>(base64Char - 'A');
-            } else if (base64Char >= 'z' && base64Char <= 'z') {
+            } else if (base64Char >= 'a' && base64Char <= 'z') {
                 return static_cast<unsigned short>(base64Char - 'a' + 26);
             } else if (base64Char >= '0' && base64Char <= '9') {
                 return static_cast<unsigned short>(base64Char - '0' + 52);
