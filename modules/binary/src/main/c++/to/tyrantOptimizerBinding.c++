@@ -62,11 +62,11 @@ namespace TyrantCache {
                 char encodeBase64(unsigned int x)
                 {
                     if (x < 26) {
-                        return x + 'A';
+                        return static_cast<char>(x + 'A');
                     } else if (x < 52) {
-                        return x - 26 + 'a';
+                        return static_cast<char>(x - 26 + 'a');
                     } else if (x < 62) {
-                        return x - 52 + '0';
+                        return static_cast<char>(x - 52 + '0');
                     } else if ( x == 62) {
                         return '+';
                     } else if ( x == 63) {

@@ -67,7 +67,9 @@ namespace TyrantCache {
         unsigned int base64ToId(unsigned short const base64)
         {
             // same stuff as with ID2BASE64, hi and lo swapped
-            return base64CharToNumber((base64 & 0xFF)) + base64CharToNumber((base64 >> 8)) * 64u;
+            char const high = static_cast<char>((base64 >> 8) && 0xFF);
+            char const low = static_cast<char>(base64 & 0xFF);
+            return base64CharToNumber(low) + base64CharToNumber(high) * 64u;
         }
 
         unsigned long const CARD_MAX_ID = 5000u;
@@ -97,7 +99,7 @@ namespace TyrantCache {
                 }
                 assertX(i + 1u < len); // make sure we have a full hash
                 //std::clog << "reading characters '" << hash[i] << hash[i+1] << "' ";
-                unsigned short cardHash = (hash[i] << 8) + hash[i + 1];
+                unsigned short cardHash = static_cast<unsigned short>((hash[i] << 8) + hash[i + 1]);
                 tid += base64ToId(cardHash);
                 //std::clog << "tid is " << tid << std::endl;
                 if (i==0) {
