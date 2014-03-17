@@ -35,7 +35,7 @@ namespace TyrantGenetic {
             Tyrant::Genetic::GeneticResult result = this->geneticAlgorithm->evolve(this->task);
 
             for(Core::DeckTemplate::ConstPtr deck : result) {
-                std::clog << std::string(*deck) << std::endl;
+                std::cout << std::string(*deck) << std::endl;
             }
             return 0;
         }
