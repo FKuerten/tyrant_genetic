@@ -67,8 +67,9 @@ namespace TyrantGenetic {
                 if (Core::StaticDeckTemplate::ConstPtr sDeck = std::dynamic_pointer_cast<Core::StaticDeckTemplate const>(deck)) {
                     command->task.initialPopulation.insert(sDeck);
                     command->task.simulationTask.defender
-                        = TyrantCache::CLI::parseDeck("BASE64RLEMINUS:UP-FI-EW-E/+j-EQiC+k");
-                    command->task.simulationTask.surge = true;
+                        = TyrantCache::CLI::parseDeck("RAIDID:19");
+                    command->task.simulationTask.surge = false;
+                    command->task.byPoints = true;
                 } else {
                     throw InvalidUserInputError("Can only work with static decks.");
                 }
