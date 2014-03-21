@@ -191,6 +191,8 @@ namespace Tyrant {
             Population population(arguments.initialPopulation.cbegin()
                                   ,arguments.initialPopulation.cend()
                                   );
+            this->logger->write("Starting genetic algorithm with initial population of ")
+                        ->writeln(population.size());
             Logger::Ptr subLogger = this->getSubLogger(this->logger, 2);
             this->preMutate(arguments, population);
             unsigned int const populationTreshold =
@@ -229,7 +231,7 @@ namespace Tyrant {
         }
 
         //##############################################################
-        //##                     Level >=0                            ##
+        //##                     Level >=1                            ##
         //##############################################################
         Core::StaticDeckTemplate::ConstPtr
         GeneticAlgorithm::mutate

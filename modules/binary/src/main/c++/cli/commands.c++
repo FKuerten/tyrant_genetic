@@ -19,6 +19,12 @@ namespace TyrantGenetic {
             this->aborted = true;
         }
 
+        bool
+        Command::isAborted() const
+        {
+            return this->aborted;
+        }
+
         VersionCommand::VersionCommand(Configuration configuration)
         : Command(configuration)
         {

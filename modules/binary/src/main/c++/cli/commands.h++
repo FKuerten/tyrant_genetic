@@ -14,7 +14,7 @@
                     bool aborted;
 
                 protected:
-                    bool isAborted();
+                    bool isAborted() const;
                     Configuration configuration;
 
                 public:

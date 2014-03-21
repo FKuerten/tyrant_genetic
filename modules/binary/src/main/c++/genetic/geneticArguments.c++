@@ -5,12 +5,12 @@ namespace Tyrant {
 
         GeneticArguments::GeneticArguments()
         : initialPopulation()
-        , minPopulationSize(100)
-        , maxPopulationSize(1000)
-        , parentDeathProbability(0.25)
-        , numberOfChildren(4)
-        , childMutationProbability(0.01)
-        , numberOfGenerations(10)
+        , minPopulationSize(1000)
+        , maxPopulationSize(2000)
+        , parentDeathProbability(0.15)
+        , numberOfChildren(10)
+        , childMutationProbability(0.15)
+        , numberOfGenerations(20)
         , byPoints(false)
         , mutateAttacker(true)
         {

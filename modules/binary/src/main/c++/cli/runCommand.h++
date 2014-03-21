@@ -13,12 +13,15 @@
             class RunCommand : public Command {
                 public:
                     typedef std::shared_ptr<RunCommand> Ptr;
+
                 public:
                     Genetic::GeneticArguments task;
+                    bool attackerFromStdIn;
+
                 private:
                     Tyrant::Genetic::GeneticAlgorithm::Ptr geneticAlgorithm;
                 public:
-                    RunCommand(Configuration);
+                    RunCommand(Configuration, bool attackerFromStdIn);
                     ~RunCommand();
 
                     int execute();
