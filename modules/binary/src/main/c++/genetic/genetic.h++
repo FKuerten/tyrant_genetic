@@ -52,6 +52,7 @@
                     Population reproduceStep
                         (Praetorian::Basics::Logging::Logger::Ptr logger
                         ,GeneticArguments const & arguments
+                        ,unsigned int generationIndex
                         ,Population population);
 
                     void sortAndCrop

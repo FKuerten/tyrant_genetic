@@ -11,15 +11,20 @@
                 Mutator::CSDeckSet initialPopulation;
                 unsigned int minPopulationSize;
                 unsigned int maxPopulationSize;
-                double parentDeathProbability;
+                double initialParentDeathProbability;
+                double parentDeathProbabilityPerGeneration;
                 unsigned int numberOfChildren;
-                double childMutationProbability;
+                double initialChildMutationProbability;
+                double childMutationProbabilityPerGeneration;
                 unsigned int numberOfGenerations;
                 bool byPoints;
                 bool mutateAttacker;
                 Core::SimulationTask simulationTask;
 
                 GeneticArguments();
+
+                double parentDeathProbability(unsigned int const generation) const;
+                double childMutationProbability(unsigned int const generation) const;
             };
 
 

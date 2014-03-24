@@ -217,7 +217,12 @@ namespace Tyrant {
                 }
 
                 // Increase population again
-                population = this->reproduceStep(subLogger, arguments, population);
+                population = this->reproduceStep
+                    (subLogger
+                    ,arguments
+                    ,generationIndex
+                    , population
+                    );
 
                 // Statistics
                 this->printStatistics(this->logger, arguments, population);
@@ -573,6 +578,7 @@ namespace Tyrant {
         GeneticAlgorithm::reproduceStep
             (Praetorian::Basics::Logging::Logger::Ptr logger
             ,GeneticArguments const & arguments
+            ,unsigned int generationIndex
             ,Population population)
         {
             unsigned int const numberOfParents = 2;
@@ -590,7 +596,7 @@ namespace Tyrant {
                         logger->write(" and ");
                     }
                     logger->write(*parent);
-                    if (randomDouble() >= arguments.parentDeathProbability) {
+                    if (randomDouble() >= arguments.parentDeathProbability(generationIndex)) {
                         result.push_back(parent);
                     } else {
                         logger->write(" (deceased)");
@@ -599,7 +605,7 @@ namespace Tyrant {
                 }}
                 logger->write(" produced ");
 
-                // Genereate children
+                // Generate children
                 {bool first = true; for(unsigned int i = 0; i < arguments.numberOfChildren; i++) {
                     if(!first) {
                         logger->write(" and ");
@@ -607,7 +613,7 @@ namespace Tyrant {
                     // Recombinate one child
                     Core::StaticDeckTemplate::ConstPtr child =
                         recombinateDeck(arguments, parents);
-                    while (randomDouble() <= arguments.childMutationProbability) {
+                    while (randomDouble() <= arguments.childMutationProbability(generationIndex)) {
                         child = mutate(child);
                     }
                     result.push_back(child);
