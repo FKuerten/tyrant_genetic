@@ -612,6 +612,10 @@ namespace Tyrant {
             ,unsigned int generationIndex
             ,Population population)
         {
+            double const parentDeathProbability
+                = arguments.parentDeathProbability(generationIndex);
+            double const childMutationProbability
+                = arguments.childMutationProbability(generationIndex);
             unsigned int const numberOfParents = 2;
             Population result;
             while(population.size() >= numberOfParents) {
@@ -627,7 +631,7 @@ namespace Tyrant {
                         logger->write(" and ");
                     }
                     logger->write(*parent);
-                    if (randomDouble() >= arguments.parentDeathProbability(generationIndex)) {
+                    if (randomDouble() >= parentDeathProbability) {
                         result.push_back(parent);
                     } else {
                         logger->write(" (deceased)");
@@ -644,7 +648,8 @@ namespace Tyrant {
                     // Recombinate one child
                     Core::StaticDeckTemplate::ConstPtr child =
                         recombinateDeck(arguments, parents);
-                    while (randomDouble() <= arguments.childMutationProbability(generationIndex)) {
+
+                    while (randomDouble() <= childMutationProbability) {
                         child = mutate(child);
                     }
                     result.push_back(child);

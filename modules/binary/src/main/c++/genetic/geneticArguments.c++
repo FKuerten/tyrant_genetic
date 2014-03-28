@@ -22,18 +22,32 @@ namespace Tyrant {
             (unsigned int generation
             ) const
         {
-            return this->initialChildMutationProbability
-                 + generation * this->childMutationProbabilityPerGeneration
-                 ;
+            double p = this->initialChildMutationProbability
+                     + generation * this->childMutationProbabilityPerGeneration
+                     ;
+            if (p < 0) {
+                return 0;
+            } else if (p > 1) {
+                return 1;
+            } else {
+                return p;
+            }
         }
 
         double GeneticArguments::parentDeathProbability
             (unsigned int generation
             ) const
         {
-            return this->initialParentDeathProbability
-                 + generation * this->parentDeathProbabilityPerGeneration
-                 ;
+            double p = this->initialParentDeathProbability
+                     + generation * this->parentDeathProbabilityPerGeneration
+                     ;
+            if (p < 0) {
+                return 0;
+            } else if (p > 1) {
+                return 1;
+            } else {
+                return p;
+            }
         }
 
     }
