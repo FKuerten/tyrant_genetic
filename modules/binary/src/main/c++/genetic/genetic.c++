@@ -652,9 +652,11 @@ namespace Tyrant {
                     while (randomDouble() <= childMutationProbability) {
                         child = mutate(child);
                     }
-                    result.push_back(child);
-                    logger->write(*child);
-                    first = false;
+                    if (this->mutator->isValid(*child)) {
+                        result.push_back(child);
+                        logger->write(*child);
+                        first = false;
+                    }
                 }}
                 logger->writeln(".");
             }
