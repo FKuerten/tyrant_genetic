@@ -83,10 +83,26 @@ namespace Tyrant {
 
                 bool operator() (Core::StaticDeckTemplate::ConstPtr a, Core::StaticDeckTemplate::ConstPtr b)
                 {
+                    bool const aValid = this->mutator.isValid(*a);
+                    bool const bValid = this->mutator.isValid(*b);
+                    if (!aValid && bValid) {
+                        return this->ascending;
+                    } else if (aValid && !bValid) {
+                        return !this->ascending;
+                    }
+                    bool const aComposable = this->mutator.canCompose(*a);
+                    bool const bComposable = this->mutator.canCompose(*a);
+                    if (!aComposable && bComposable) {
+                        return this->ascending;
+                    } else if (aComposable && !bComposable) {
+                        return !this->ascending;
+                    }
+                    double const aScore = this->getScore(a);
+                    double const bScore = this->getScore(b);
                     if (this->ascending) {
-                        return this->getScore(a) < this->getScore(b);
+                        return aScore < bScore;
                     } else {
-                        return this->getScore(a) > this->getScore(b);
+                        return aScore > bScore;
                     }
                 }
         };
