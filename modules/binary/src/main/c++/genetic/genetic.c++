@@ -288,6 +288,7 @@ namespace Tyrant {
             )
         {
             unsigned int size = population.size();
+            assertGT(size, 0u);
             unsigned int index = static_cast<unsigned int>(rand()) % size;
             Core::StaticDeckTemplate::ConstPtr element
                 = population[index];
@@ -316,6 +317,9 @@ namespace Tyrant {
                     }
                 } else {
                     failures = 0;
+                }
+                if (this->aborted) {
+                    throw new AbortionException("Aborted in preMutate");
                 }
             }
             this->logger->writeln("done.");
