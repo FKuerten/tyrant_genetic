@@ -180,29 +180,27 @@ namespace Tyrant {
                 }
                 scores.push_back(score);
             }
+            logger->write("           best:    ")->write(bestScore)
+                  ->write(" with ")->writeln(*bestDeck)
+                  ->write("           worst:   ")->write(worstScore)
+                  ->write(" with ")->writeln(*worstDeck);
+
             std::sort(scores.begin(), scores.end());
 
             double sum = 0;
             for(double score : scores) {
                 sum+=score;
             }
+            double const average = sum / size;
+            logger->write("           average: ")->write(average);
 
-            size_t const size = scores.size();
             double median;
             if (size % 2 == 0) {
                 median = (scores[size/2-1] + scores[size/2]) / 2;
             } else {
                 median = scores[size / 2];
             }
-            double const average = sum / size;
-
-            logger->write("Population size:    ")->writeln(size)
-                  ->write("           best:    ")->write(bestScore)
-                  ->write(" with ")->writeln(*bestDeck)
-                  ->write("           worst:   ")->write(worstScore)
-                  ->write(" with ")->writeln(*worstDeck)
-                  ->write("           average: ")->write(average)
-                  ->write("           median:  ")->write(median)
+            logger->write("           median:  ")->write(median)
                   ->writeln();
         }
 
