@@ -431,7 +431,10 @@ namespace Tyrant {
             unsigned int const numberOfDecksToPick = 2;
             unsigned int const numberOfDecksToKeep = 1;
             Population result;
-            while(population.size() >= numberOfDecksToPick) {
+            while(   population.size() >= numberOfDecksToPick
+                  && population.size() + result.size() > arguments.minPopulationSize
+                 )
+            {
                 // Randomly pick decks
                 Population pickedDecks
                     = pickAndRemoveRandomElements
@@ -622,7 +625,10 @@ namespace Tyrant {
                 = arguments.childMutationProbability(generationIndex);
             unsigned int const numberOfParents = 2;
             Population result;
-            while(population.size() >= numberOfParents) {
+            while(   population.size() >= numberOfParents
+                  && population.size() + result.size() < arguments.maxPopulationSize
+                 )
+            {
                 logger->write("Parents ");
                 // Randomly pick decks
                 Population parents
