@@ -642,7 +642,7 @@ namespace Tyrant {
 
                 // Generate children
                 {bool first = true; for(unsigned int i = 0; i < arguments.numberOfChildren; i++) {
-                    if(!first) {
+                    if (!first) {
                         logger->write(" and ");
                     }
                     // Recombinate one child
