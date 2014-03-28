@@ -15,19 +15,22 @@ namespace Tyrant {
     namespace Genetic {
 
          class DeckComparator {
-            Core::SimulatorCore::Ptr simulator;
+            Core::SimulatorCore & simulator;
+            Mutator::Mutator & mutator;
             GeneticArguments const & arguments;
             bool ascending;
             Logger::Ptr logger;
 
             public:
                 DeckComparator
-                    (Core::SimulatorCore::Ptr simulator
+                    (Core::SimulatorCore & simulator
+                    ,Mutator::Mutator & mutator
                     ,GeneticArguments const & arguments
                     ,bool ascending
                     ,Logger::Ptr logger
                     )
                 : simulator(simulator)
+                , mutator(mutator)
                 , arguments(arguments)
                 , ascending(ascending)
                 , logger(logger)
@@ -58,7 +61,7 @@ namespace Tyrant {
                         }
                     }
 
-                    Core::SimulationResult result = this->simulator->simulate(task);
+                    Core::SimulationResult result = this->simulator.simulate(task);
                     if (DEBUG_GET_SCORE) {
                         this->logger->write("    result.gamesWon=")->writeln(result.gamesWon);
                         this->logger->write("    result.numberOfGames=")->writeln(result.numberOfGames);
@@ -134,12 +137,21 @@ namespace Tyrant {
                 return;
             }
 
+            size_t const size = population.size();
+
+            logger->write("Population size:    ")->writeln(size);
+
             Core::StaticDeckTemplate::ConstPtr bestDeck, worstDeck;
             double bestScore = std::numeric_limits<double>::min();
             double worstScore = std::numeric_limits<double>::max();
             std::vector<double> scores;
 
-            DeckComparator compare(this->simulator, arguments, false, logger);
+            DeckComparator compare(*this->simulator
+                                  ,*this->mutator
+                                  ,arguments
+                                  ,false
+                                  ,logger
+                                  );
             for(Core::StaticDeckTemplate::ConstPtr deck : population) {
                 double score = compare.getScore(deck);
                 if (score > bestScore) {
@@ -331,7 +343,12 @@ namespace Tyrant {
             ,Population & decks
             ,unsigned int targetSize)
         {
-            DeckComparator compare(this->simulator, arguments, false, this->logger);
+            DeckComparator compare(*this->simulator
+                                  ,*this->mutator
+                                  ,arguments
+                                  ,false
+                                  ,this->logger
+                                  );
             if (false) {
                 // Unfortunately compare might not be a strict weak ordering
                 // this is very unlikely, but might happen.
