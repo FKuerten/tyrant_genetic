@@ -91,7 +91,7 @@ namespace Tyrant {
                         return !this->ascending;
                     }
                     bool const aComposable = this->mutator.canCompose(*a);
-                    bool const bComposable = this->mutator.canCompose(*a);
+                    bool const bComposable = this->mutator.canCompose(*b);
                     if (!aComposable && bComposable) {
                         return this->ascending;
                     } else if (aComposable && !bComposable) {
