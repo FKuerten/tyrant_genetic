@@ -187,11 +187,11 @@ namespace Tyrant {
 
             std::sort(scores.begin(), scores.end());
 
-            double sum = 0;
+            long double sum = 0;
             for(double score : scores) {
                 sum+=score;
             }
-            double const average = sum / size;
+            long double const average = sum / size;
             logger->write("           average: ")->write(average);
 
             double median;
@@ -287,9 +287,9 @@ namespace Tyrant {
             (Population const & population
             )
         {
-            unsigned int size = population.size();
-            assertGT(size, 0u);
-            unsigned int index = static_cast<unsigned int>(rand()) % size;
+            size_t size = population.size();
+            assertGT(size, static_cast<size_t>(0u));
+            size_t index = static_cast<unsigned int>(rand()) % size;
             Core::StaticDeckTemplate::ConstPtr element
                 = population[index];
             return this->mutate(element);
@@ -303,9 +303,9 @@ namespace Tyrant {
         {
             assertX(this->logger);
             this->logger->write("Premutating... ");
-            unsigned int failures = 0;
-            unsigned int const maxFailures = 1000;
-            unsigned int populationSize;
+            size_t failures = 0;
+            size_t const maxFailures = 1000;
+            size_t populationSize;
             while((populationSize = population.size()) < arguments.minPopulationSize) {
                 Core::StaticDeckTemplate::ConstPtr randomMutation
                     = this->generateRandomMutation(population);
@@ -330,8 +330,8 @@ namespace Tyrant {
         pickAndRemoveRandomElement
             (std::vector<T> & population)
         {
-            unsigned int size = population.size();
-            unsigned int index = static_cast<unsigned int>(rand()) % size;
+            size_t size = population.size();
+            size_t index = static_cast<unsigned int>(rand()) % size;
             T element = population[index];
             population.erase(population.begin() + index);
             return element;
@@ -340,7 +340,7 @@ namespace Tyrant {
         Population
         pickAndRemoveRandomElements
             (Population & population
-            ,unsigned int numberOfDecksToPick
+            ,size_t numberOfDecksToPick
             )
         {
             // Randomly pick decks
@@ -416,7 +416,7 @@ namespace Tyrant {
                 // Check that each pointer points to something valid.
                 for (auto a: decks) {
                     assertX(a.get() != nullptr);
-                    assertGT(std::string(*a).size(),0u);
+                    assertGT(std::string(*a).size(),static_cast<size_t>(0u));
                 }
             }
             std::sort(decks.begin(), decks.end(), compare);
@@ -476,7 +476,7 @@ namespace Tyrant {
             return deck->getCommanderId();
         }
 
-        unsigned int
+        size_t
         getSize
             (Core::StaticDeckTemplate::ConstPtr deck
             )
@@ -513,7 +513,7 @@ namespace Tyrant {
             ,std::vector<bool> parents
             )
         {
-            unsigned int size = parents.size();
+            size_t size = parents.size();
             return parents[static_cast<unsigned int>(rand()) % size];
         }
 
@@ -523,7 +523,7 @@ namespace Tyrant {
             ,std::vector<unsigned int> parents
             )
         {
-            unsigned int size = parents.size();
+            size_t size = parents.size();
             return parents[static_cast<unsigned int>(rand()) % size];
         }
 
@@ -533,7 +533,7 @@ namespace Tyrant {
             ,std::vector<unsigned int> parents
             )
         {
-            unsigned int size = parents.size();
+            size_t size = parents.size();
             return parents[static_cast<unsigned int>(rand()) % size];
         }
 

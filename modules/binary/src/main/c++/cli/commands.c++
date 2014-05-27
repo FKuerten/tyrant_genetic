@@ -59,7 +59,7 @@ namespace TyrantGenetic {
             std::cout << "XML data version: "       << std::endl;
             Tyrant::Core::SimulatorCore::Ptr core = this->configuration.constructCore();
             std::map<std::string,std::string> xmlHashes = core->getXMLVersions();
-            assertGT(xmlHashes.size(),0u);
+            assertGT(xmlHashes.size(),static_cast<size_t>(0));
             for(std::map<std::string,std::string>::const_iterator iter = xmlHashes.begin()
                ;iter != xmlHashes.end()
                ;iter++
