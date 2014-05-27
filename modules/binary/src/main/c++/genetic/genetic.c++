@@ -83,6 +83,8 @@ namespace Tyrant {
 
                 bool operator() (Core::StaticDeckTemplate::ConstPtr a, Core::StaticDeckTemplate::ConstPtr b)
                 {
+                    assertX(a.get() != nullptr);
+                    assertX(b.get() != nullptr);
                     bool const aValid = this->mutator.isValid(*a);
                     bool const bValid = this->mutator.isValid(*b);
                     if (!aValid && bValid) {
@@ -215,8 +217,8 @@ namespace Tyrant {
             // Store our population, initially the initial population,
             // will be updated.
             Population population(arguments.initialPopulation.cbegin()
-                                  ,arguments.initialPopulation.cend()
-                                  );
+                                 ,arguments.initialPopulation.cend()
+                                 );
             this->logger->write("Starting genetic algorithm with initial population of ")
                         ->writeln(population.size());
             Logger::Ptr subLogger = this->getSubLogger(this->logger, 2);
