@@ -333,9 +333,9 @@ namespace Tyrant {
             (std::vector<T> & population)
         {
             size_t size = population.size();
-            size_t index = static_cast<unsigned int>(rand()) % size;
+            size_t index = static_cast<size_t>(rand()) % size;
             T element = population[index];
-            population.erase(population.begin() + index);
+            population.erase(population.begin() + static_cast<typename std::vector<T>::difference_type>(index));
             return element;
         }
 
