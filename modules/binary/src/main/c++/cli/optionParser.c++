@@ -104,6 +104,7 @@ namespace TyrantGenetic {
                 }
                 command->task.simulationTask.surge = false;
                 command->task.byPoints = byPoints;
+		command->task.simulationTask.minimalNumberOfGames = 10000;
 
                 return command;
              } catch (boost::program_options::required_option &e) {
