@@ -4,7 +4,7 @@ target/tyrantGenetic: modules/binary/target/tyrantGenetic-static-debug
     @mkdir -p target
     cp ${input} ${output}
 
-$(phony compile binaries): modules/binary/binaries
+$(phony compile binaries): modules/binary/binaries target/tyrantGenetic
 
 tyrant_optimize: ../tyrant_optimize/tyrant_optimize
     cp ${input} ${output}
