@@ -1,0 +1,5 @@
+This is TyrantGenetic.
+
+This cli wrapper provides allows to to a genetic evolution of decks.
+The "--version" switch will give you information on the version of the cli wrapper.
+The "--help" switch will list all options.

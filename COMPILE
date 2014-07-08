@@ -1,0 +1,7 @@
+The project is set up to compile with makepp[1].
+The Makeppfile might be compatible to old make (but I doubt it), in any case it should contain some hints for compilation options.
+
+Quick build tutorial:
+1. run `makepp compile`
+
+[1] http://makepp.sourceforge.net/

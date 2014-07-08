@@ -1,0 +1,7 @@
+This file belongs to TyrantGenetic (the cli wrapper, but it applies to the whole family).
+
+This one was created way after IterateDecks ceased to be maintained, however it is related.
+It was created in May 2014 by Fabian "Praetorian" Kürten.
+
+TyrantGenetic consists of some libraries and a cli wrapper, most of this is a copied from my modifications to Iteratedecks, however there also have been a lot of redesigns and improvements.
+The libraries and were developed earlier for the other wrappers.
